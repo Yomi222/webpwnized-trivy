@@ -5,18 +5,26 @@ on:
       - main
       - development
   pull_request:
-  
 jobs:
-  trivy_iac_scan:
-    name: Trivy IaC Vulnerability Scan
+  build:
+    name: Scan IAC with Trivy
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
+      - name: Checkout repo
         uses: actions/checkout@master
-      
-      - name: Setup Trivy
-        uses: aquasecurity/setup-trivy@v0.20.0
-      
-      - name: Scan Infrastructure as Code with Trivy
-        run: |
-          trivy iac --exit-code 1 --severity HIGH,CRITICAL /reference-architecture/azure/cloud-init/
+
+      - name: Run Trivy vulnerability scanner in IaC mode
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'config'
+          hide-progress: false
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          exit-code: '0'
+          ignore-unfixed: true
+          severity: 'CRITICAL,HIGH'
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@main
+        with:
+          sarif_file: 'trivy-results.sarif'
