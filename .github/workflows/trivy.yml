@@ -1,20 +1,18 @@
-name: Trivy IaC Vulnerability Scan
-
+name: run-trivy
 on:
   push:
     branches:
       - main
+      - development
   pull_request:
-    branches:
-      - main
-
+  
 jobs:
   trivy_iac_scan:
     name: Trivy IaC Vulnerability Scan
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@master
       
       - name: Setup Trivy
         uses: aquasecurity/setup-trivy@v0.20.0
