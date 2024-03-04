@@ -1,29 +1,31 @@
-name: run-trivy
+name: trivy-scan
+
 on:
   push:
     branches:
       - main
       - development
   pull_request:
+
 jobs:
-  build:
-    name: Scan IAC with Trivy
+  trivy_scan:
+    name: Scan IaC with Trivy
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@master
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
       - name: Run Trivy vulnerability scanner in IaC mode
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@v1
         with:
           scan-type: 'config'
           hide-progress: false
           format: 'table'
-          output: "results.sarif"
+          output: "trivy-results.sarif"
           ignore-unfixed: true
           severity: 'CRITICAL,HIGH'
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v3
         with:
-          sarif_file: "results.sarif"
+          sarif_file: "trivy-results.sarif"
